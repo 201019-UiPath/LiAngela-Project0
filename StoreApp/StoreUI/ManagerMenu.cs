@@ -8,6 +8,9 @@ using StoreLib;
 
 namespace StoreUI
 {
+    /// <summary>
+    /// Manager menu implementing IMenu interface
+    /// </summary>
     public class ManagerMenu : IMenu
     {
         private string userInput;
@@ -51,8 +54,10 @@ namespace StoreUI
                             Console.WriteLine(location);
                         }
                         userInput = Console.ReadLine();
-                        // validate user input
-                        SelectLocation(Int32.Parse(userInput));
+                        int i = 0;
+                        if (int.TryParse(userInput, out i)) {
+                            SelectLocation(i);
+                        }
                         break;
                     case "1":
                         ViewCustomerList();

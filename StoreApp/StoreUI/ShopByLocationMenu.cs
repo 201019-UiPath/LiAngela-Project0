@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Serilog;
 
 using StoreDB;
 using StoreDB.Models;
@@ -9,7 +10,7 @@ using StoreLib;
 namespace StoreUI
 {
     /// <summary>
-    /// Shopping menu interface persisting customer identity and store location
+    /// Shopping menu implementing IMenu interface persisting customer identity and store location
     /// </summary>
     public class ShopByLocationMenu : IMenu
     {
@@ -68,9 +69,13 @@ namespace StoreUI
                         Console.WriteLine("\nChoose your product:");
                         PrintInventory();
                         userInput = Console.ReadLine();
-                        // add input validation
-                        Product product = productService.GetProductById(productMenuMapping.GetValueOrDefault(Int32.Parse(userInput)));
-                        Console.WriteLine($"\nProduct ID {product.ProductId}: {product.Name} ({product.Price.ToString("C")}): [description here]");
+                        int i = 0;
+                        if (int.TryParse(userInput, out i)) {
+                            if (productMenuMapping.ContainsKey(i)) {
+                                Product product = productService.GetProductById(productMenuMapping.GetValueOrDefault(i));
+                                Console.WriteLine($"\nProduct ID {product.ProductId}: {product.Name} ({product.Price.ToString("C")}): {product.Description}");
+                            }
+                        }
                         break;
                     case "1":
                         UpdateCart();
@@ -92,7 +97,6 @@ namespace StoreUI
                         break;
                     case "4":
                         PrintOrders();
-                        SortOrdersDifferently();
                         break;
                     case "5":
                         PrintInventory();
@@ -116,25 +120,32 @@ namespace StoreUI
             Console.WriteLine("\nChoose the product you want to add/update in your order:");
             PrintInventory();
             userInput = Console.ReadLine();
-            // add input validation
-            int productId = productMenuMapping.GetValueOrDefault(Int32.Parse(userInput));
-            int currentQuantity = cart.GetValueOrDefault(productId);
-            Product product = productService.GetProductById(productId);
-            Console.WriteLine($"\nYou currently have {currentQuantity} unit{(currentQuantity == 1 ? "" : "s")} of product {product.Name} in your cart!");
-            Console.Write("Enter desired quantity: ");
-            userInput = Console.ReadLine();
-            // add input validation
-            if (cart.ContainsKey(productId)) {
-                if (Int32.Parse(userInput) == 0) {
-                    cart.Remove(productId);
-                } else {
-                    cart[productId] = Int32.Parse(userInput);
+            int i = 0;
+            if (int.TryParse(userInput, out i)) {
+                int productId = productMenuMapping.GetValueOrDefault(i);
+                int currentQuantity = cart.GetValueOrDefault(productId);
+                Product product = productService.GetProductById(productId);
+                Console.WriteLine($"\nYou currently have {currentQuantity} unit{(currentQuantity == 1 ? "" : "s")} of product {product.Name} in your cart!");
+                Console.Write("Enter desired quantity: ");
+                userInput = Console.ReadLine();
+                if (int.TryParse(userInput, out i)) {
+                    int quantity = i;
+                    if (cart.ContainsKey(productId)) {
+                        if (quantity < 1) {
+                            cart.Remove(productId);
+                        } else {
+                            cart[productId] = quantity;
+                        }
+                    } else {
+                        if (quantity > 0) {
+                            cart.Add(productId, quantity);
+                        }
+                    }
+                    Console.WriteLine("\nYour cart has been updated!\nUpdated cart:");
+                    Log.Information("Cart has been updated");
+                    PrintCart();
                 }
-            } else {
-                cart.Add(productId, Int32.Parse(userInput));
             }
-            Console.WriteLine("\nYour cart has been updated!\nUpdated cart:");
-            PrintCart();
         }
 
         public void PrintCart() {
@@ -146,8 +157,13 @@ namespace StoreUI
 
         public void PrintOrders() {
             List<string> orderList = orderService.GetOrdersByLocationId(location.LocationId);
-            foreach(string order in orderList) {
-                Console.WriteLine(order);
+            if (orderList.Count == 0) {
+                Console.WriteLine($"No orders have been placed at {location.Name} yet!");
+            } else {
+                foreach(string order in orderList) {
+                    Console.WriteLine(order);
+                }
+                SortOrdersDifferently();
             }
         }
 
@@ -196,6 +212,8 @@ namespace StoreUI
             order.TotalPrice = subtotal + Math.Round(decimal.Multiply(subtotal, Convert.ToDecimal(0.0825)), 2);
             orderService.PlaceOrder(order, cart);
             productService.UpdateProductStocks(location.LocationId, cart, false);
+            Console.WriteLine("Your order has been placed!");
+            Log.Information("Order has been placed");
             cart.Clear();
         }
     }

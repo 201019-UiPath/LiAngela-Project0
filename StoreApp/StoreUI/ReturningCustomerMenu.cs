@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using Serilog;
 
 using StoreDB;
 using StoreDB.Models;
@@ -8,6 +10,9 @@ using StoreLib;
 
 namespace StoreUI
 {
+    /// <summary>
+    /// Returning customer menu implementing IMenu interface persisting customer identity
+    /// </summary>
     public class ReturningCustomerMenu : IMenu
     {
         private string userInput;
@@ -35,6 +40,7 @@ namespace StoreUI
         public void Start()
         {
             EstablishCustomerIdentity();
+            Log.Information("Customer has established identity");
             do {
                 Console.WriteLine($"\nHi {customer.Name}! What do you want to do today? (type \"x\" to go back)");
                 Console.WriteLine("[0] Go shopping to make your home more energy-efficient!");
@@ -47,7 +53,6 @@ namespace StoreUI
                         break;
                     case "1":
                         PrintOrders();
-                        SortOrdersDifferently();
                         break;
                     case "2":
                         ViewCustomerInformation();
@@ -69,8 +74,13 @@ namespace StoreUI
 
         public void PrintOrders() {
             List<string> orderList = orderService.GetOrdersByCustomerId(customer.CustomerId);
-            foreach(string order in orderList) {
-                Console.WriteLine(order);
+            if (orderList.Count == 0) {
+                Console.WriteLine("You have not yet placed an order!");
+            } else {
+                foreach(string order in orderList) {
+                    Console.WriteLine(order);
+                }
+                SortOrdersDifferently();
             }
         }
 

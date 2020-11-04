@@ -1,4 +1,5 @@
 using System;
+using Serilog;
 
 using StoreDB.Models;
 using StoreDB.Repos;
@@ -6,6 +7,9 @@ using StoreLib;
 
 namespace StoreUI
 {
+    /// <summary>
+    /// Customer menu implementing IMenu interface
+    /// </summary>
     public class CustomerMenu : IMenu
     {
         private string userInput;
@@ -32,6 +36,8 @@ namespace StoreUI
                     case "0":
                         Customer newCustomer = CustomerSignup();
                         customerService.AddCustomer(newCustomer);
+                        Console.WriteLine($"Customer {newCustomer.Name} added!");
+                        Log.Information("Customer has been added");
                         break;
                     case "1":
                         returningCustomerMenu.Start();

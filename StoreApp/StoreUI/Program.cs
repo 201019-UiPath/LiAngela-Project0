@@ -1,4 +1,5 @@
-﻿using StoreDB;
+﻿using Serilog;
+using StoreDB;
 
 namespace StoreUI
 {
@@ -6,9 +7,17 @@ namespace StoreUI
     {
         static void Main(string[] args)
         {
-            // add logging
+            Log.Logger = new LoggerConfiguration()
+            .MinimumLevel.Debug()
+            .WriteTo.File("log.txt")
+            .CreateLogger();
+
+            Log.Information("Program started");
+
             IMenu startMenu = new StartMenu(new StoreContext());
             startMenu.Start();
+
+            Log.CloseAndFlush();
         }
     }
 }

@@ -9,7 +9,7 @@ using StoreLib;
 namespace StoreUI
 {
     /// <summary>
-    /// Shopping menu interface persisting customer identity
+    /// Shopping menu implementing IMenu interface persisting customer identity
     /// </summary>
     public class ShoppingMenu : IMenu
     {
@@ -58,8 +58,10 @@ namespace StoreUI
                             Console.WriteLine(location);
                         }
                         userInput = Console.ReadLine();
-                        // add input validation
-                        SelectLocation(Int32.Parse(userInput));
+                        int i = 0;
+                        if (int.TryParse(userInput, out i)) {
+                            SelectLocation(i);
+                        }
                         break;
                     case "1":
                         Console.WriteLine("\nChoose your product:");
@@ -84,22 +86,31 @@ namespace StoreUI
 
         public void ChooseProduct() {
             userInput = Console.ReadLine();
-            // add input validation
-            int productId = Int32.Parse(userInput);
-            Product product = productService.GetProductById(productId);
-            Console.WriteLine($"\n{product.Name} is in stock at the following locations:");
-            List<string> locationStockList = productService.ViewProductStockByProductId(productId, out locationMenuMapping);
-            foreach(string location in locationStockList) {
-                Console.WriteLine(location);
+            int i = 0;
+            if (int.TryParse(userInput, out i)) {
+                int productId = i;
+                Product product = productService.GetProductById(productId);
+                List<string> locationStockList = productService.ViewProductStockByProductId(productId, out locationMenuMapping);
+                if (locationStockList.Count == 0) {
+                    Console.WriteLine($"{product.Name} is currently out of stock!");
+                } else {
+                    Console.WriteLine($"\n{product.Name} is in stock at the following locations:");
+                    foreach(string location in locationStockList) {
+                        Console.WriteLine(location);
+                    }
+                    Console.WriteLine("\nProceed to shop at one of these locations? (type \"x\" to go back)");
+                    userInput = Console.ReadLine();
+                    if (userInput.Equals("x")) {
+                        Start();
+                    }
+                    if (int.TryParse(userInput, out i)) {
+                        if (locationMenuMapping.ContainsKey(i)) {
+                            int locationId = locationMenuMapping.GetValueOrDefault(i);
+                            SelectLocation(locationId);
+                        }
+                    }
+                }
             }
-            Console.WriteLine("\nProceed to shop at one of these locations? (type \"x\" to go back)");
-            userInput = Console.ReadLine();
-            if (userInput.Equals("x")) {
-                Start();
-            }
-            // add input validation
-            int locationId = locationMenuMapping.GetValueOrDefault(Int32.Parse(userInput));
-            SelectLocation(locationId);
         }
     }
 }

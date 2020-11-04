@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Serilog;
 
 using StoreDB.Models;
 using StoreDB.Repos;
@@ -7,6 +8,9 @@ using StoreLib;
 
 namespace StoreUI
 {
+    /// <summary>
+    /// Stocking menu implementing IMenu interface persisting store location
+    /// </summary>
     public class StockingMenu : IMenu
     {
         private string userInput;
@@ -83,23 +87,30 @@ namespace StoreUI
                 Console.WriteLine(item);
             }
             userInput = Console.ReadLine();
-            // add input validation
-            int productId = Int32.Parse(userInput);
-            Product product = productService.GetProductById(productId);
-            Console.Write($"Enter quantity of {product.Name} to add: ");
-            userInput = Console.ReadLine();
-            // add input validation
-            if (productsToStock.ContainsKey(productId)) {
-                if (Int32.Parse(userInput) == 0) {
-                    productsToStock.Remove(productId);
-                } else {
-                    productsToStock[productId] = Int32.Parse(userInput);
+            int i = 0;
+            if (int.TryParse(userInput, out i)) {
+                int productId = i;
+                Product product = productService.GetProductById(productId);
+                Console.Write($"Enter quantity of {product.Name} to add: ");
+                userInput = Console.ReadLine();
+                if (int.TryParse(userInput, out i)) {
+                    int quantity = i;
+                    if (productsToStock.ContainsKey(productId)) {
+                        if (quantity == 0) {
+                            productsToStock.Remove(productId);
+                        } else {
+                            productsToStock[productId] = quantity;
+                        }
+                    } else {
+                        if (quantity > 0) {
+                            productsToStock.Add(productId, quantity);
+                        }
+                    }
+                    Console.WriteLine("\nYou have updated your products/quantities to be stocked!");
+                    Log.Information("Products/quantities to be stocked have been updated");
+                    PrintProductsToStock();    
                 }
-            } else {
-                productsToStock.Add(productId, Int32.Parse(userInput));
             }
-            Console.WriteLine("\nYou have updated your products/quantities to be stocked!");
-            PrintProductsToStock();
         }
 
         public void PrintProductsToStock() {
@@ -112,6 +123,7 @@ namespace StoreUI
         public void StockStore() {
             productService.UpdateProductStocks(location.LocationId, productsToStock, true);
             Console.WriteLine("\nYou have stocked the store!");
+            Log.Information("Store has been stocked");
             PrintInventory();
             productsToStock.Clear();
         }
