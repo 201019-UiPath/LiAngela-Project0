@@ -22,7 +22,6 @@ namespace StoreLib
         
         public void PlaceOrder(Order order, Dictionary<int, int> cart) {
             repo.AddOrder(order, cart);
-            Console.WriteLine("Order placed!");
         }
 
         public List<string> GetOrdersByCustomerId(int customerId)
@@ -30,7 +29,6 @@ namespace StoreLib
             List<string> orderList = new List<string>();
             Task<List<Order>> orderListTask = repo.GetOrdersByCustomerAsync(customerId);
             foreach(Order order in orderListTask.Result) {
-                // orderList.Add($"Order #{order.OrderId}: {order.OrderDate} {order.Location.Name}");
                 orderList.Add($"Order #{order.OrderId}: {order.OrderDate} {order.TotalPrice.ToString("C")} {order.Location.Name}");
             }
             return orderList;
@@ -41,7 +39,6 @@ namespace StoreLib
             List<string> orderList = new List<string>();
             Task<List<Order>> orderListTask = repo.GetOrdersByCustomerAsync(customerId, sortOrderMethod);
             foreach(Order order in orderListTask.Result) {
-                // orderList.Add($"Order #{order.OrderId}: {order.OrderDate} {order.Location.Name}");
                 orderList.Add($"Order #{order.OrderId}: {order.OrderDate} {order.TotalPrice.ToString("C")} {order.Location.Name}");
             }
             return orderList;
@@ -52,7 +49,6 @@ namespace StoreLib
             List<string> orderList = new List<string>();
             Task<List<Order>> orderListTask = repo.GetOrdersByLocationAsync(locationId);
             foreach(Order order in orderListTask.Result) {
-                // orderList.Add($"Order #{order.OrderId}: {order.OrderDate} {order.Customer.Name}");
                 orderList.Add($"Order #{order.OrderId}: {order.OrderDate} {order.TotalPrice.ToString("C")}");
             }
             return orderList;
@@ -63,7 +59,6 @@ namespace StoreLib
             List<string> orderList = new List<string>();
             Task<List<Order>> orderListTask = repo.GetOrdersByLocationAsync(locationId, sortOrderMethod);
             foreach(Order order in orderListTask.Result) {
-                // orderList.Add($"Order #{order.OrderId}: {order.OrderDate} {order.Customer.Name}");
                 orderList.Add($"Order #{order.OrderId}: {order.OrderDate} {order.TotalPrice.ToString("C")}");
             }
             return orderList;
