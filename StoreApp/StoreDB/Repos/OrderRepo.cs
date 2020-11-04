@@ -41,7 +41,11 @@ namespace StoreDB.Repos
 
         public int GetLastOrderId()
         {
-            return context.Orders.Select(x => x.OrderId).Max();
+            if (context.Orders.Select(x => x).Count() == 0) {
+                return 0;
+            } else {
+                return context.Orders.Select(x => x.OrderId).Max();
+            }
         }
 
         public Order GetOrderById(int orderId)
