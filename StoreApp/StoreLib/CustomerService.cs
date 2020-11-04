@@ -18,14 +18,13 @@ namespace StoreLib
 
         public void AddCustomer(Customer newCustomer) {
             repo.AddCustomerAsync(newCustomer);
-            Console.WriteLine($"Customer {newCustomer.Name} added!");
         }
 
         public List<string> GetCustomerList() {
             List<string> customerList = new List<string>();
             Task<List<Customer>> customerListTask = repo.GetAllCustomersAsync();
             foreach(Customer customer in customerListTask.Result) {
-                customerList.Add($"Customer {customer.CustomerId}: {customer.Name}");
+                customerList.Add($"Customer {customer.CustomerId}: {customer.Name} {customer.PhoneNumber} {customer.EmailAddress}");
             }
             return customerList;
         }
