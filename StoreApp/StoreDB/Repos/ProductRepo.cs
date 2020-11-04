@@ -23,7 +23,11 @@ namespace StoreDB.Repos
 
         public int GetLastProductStockId()
         {
-            return context.ProductStocks.Select(x => x.Id).Max();
+            if (context.ProductStocks.Select(x => x).Count() == 0) {
+                return 0;
+            } else {
+                return context.ProductStocks.Select(x => x.Id).Max();
+            }
         }
 
         public Product GetProductById(int productId)
