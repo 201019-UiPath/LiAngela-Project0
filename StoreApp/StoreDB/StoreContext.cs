@@ -8,6 +8,14 @@ namespace StoreDB
 {
     public class StoreContext : DbContext
     {
+        public StoreContext()
+        {
+        }
+
+        public StoreContext(DbContextOptions<StoreContext> options) : base(options)
+        {
+        }
+        
         public DbSet<Customer> Customers { get; set; }
 
         public DbSet<Location> Locations { get; set; }
@@ -77,24 +85,26 @@ namespace StoreDB
                 new Location {LocationId = 3, Name = "Location 3", PhoneNumber = "(311) 111 1111", Address = "311 Main St"});
             
             modelBuilder.Entity<Product>().HasData(
-                // new Product {ProductId = 1, Name = "Solar Panel", Price = 100, Description = "It is a solar panel"},
-                new Product {ProductId = 1, Name = "Solar Panel", Price = 100},
-                new Product {ProductId = 2, Name = "Insulated Window", Price = 50},
-                new Product {ProductId = 3, Name = "Energy-efficient Refrigerator", Price = 200},
-                new Product {ProductId = 4, Name = "Energy-efficient Dishwasher", Price = 201},
-                new Product {ProductId = 5, Name = "Energy-efficient Microwave", Price = 202},
-                new Product {ProductId = 6, Name = "Energy-efficient Oven", Price = 203},
-                new Product {ProductId = 7, Name = "High-efficiency Washer", Price = 204},
-                new Product {ProductId = 8, Name = "High-efficiency Dryer", Price = 205},
-                new Product {ProductId = 9, Name = "LED Outdoor Light Fixture", Price = 20},
-                new Product {ProductId = 10, Name = "LED Indoor Light Fixture", Price = 20});
+                new Product {ProductId = 1, Name = "Solar Panel", Price = 100, Description = "It is a solar panel"},
+                new Product {ProductId = 2, Name = "Insulated Window", Price = 50, Description = "Window has insulation"},
+                new Product {ProductId = 3, Name = "Energy-efficient Refrigerator", Price = 200, Description = "Energy-efficient refrigerator runs on 10% less electricity than normal refrigerator runs on"},
+                new Product {ProductId = 4, Name = "Energy-efficient Dishwasher", Price = 201, Description = "Energy-efficient dishwasher runs on 10% less electricity than normal dishwasher runs on"},
+                new Product {ProductId = 5, Name = "Energy-efficient Microwave", Price = 202, Description = "Energy-efficient microwave runs on 10% less electricity than normal microwave runs on"},
+                new Product {ProductId = 6, Name = "Energy-efficient Oven", Price = 203, Description = "Energy-efficient oven runs on 10% less electricity than normal oven runs on"},
+                new Product {ProductId = 7, Name = "High-efficiency Washer", Price = 204, Description = "High-efficiency front-load washer"},
+                new Product {ProductId = 8, Name = "High-efficiency Dryer", Price = 205, Description = "High-efficiency front-load dryer"},
+                new Product {ProductId = 9, Name = "LED Outdoor Light Fixture", Price = 20, Description = "LED outdoor light fixture can be installed on exterior of house"},
+                new Product {ProductId = 10, Name = "LED Indoor Light Fixture", Price = 20, Description = "LED indoor light fixture can be installed on the ceiling"});
             
             modelBuilder.Entity<ProductStock>().HasData(
                 new ProductStock {Id = 1, LocationId = 1, ProductId = 1, QuantityStocked = 10},
                 new ProductStock {Id = 2, LocationId = 1, ProductId = 2, QuantityStocked = 23},
-                new ProductStock {Id = 3, LocationId = 1, ProductId = 3, QuantityStocked = 10},
+                new ProductStock {Id = 3, LocationId = 2, ProductId = 3, QuantityStocked = 10},
                 new ProductStock {Id = 4, LocationId = 2, ProductId = 4, QuantityStocked = 10},
-                new ProductStock {Id = 5, LocationId = 3, ProductId = 5, QuantityStocked = 10});
+                new ProductStock {Id = 5, LocationId = 2, ProductId = 5, QuantityStocked = 10},
+                new ProductStock {Id = 6, LocationId = 3, ProductId = 3, QuantityStocked = 10},
+                new ProductStock {Id = 7, LocationId = 3, ProductId = 9, QuantityStocked = 10},
+                new ProductStock {Id = 8, LocationId = 3, ProductId = 10, QuantityStocked = 10});
         }
     }
 }
