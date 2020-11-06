@@ -67,7 +67,11 @@ namespace StoreUI
         public void EstablishCustomerIdentity() {
             Console.WriteLine("\nWelcome back! Please enter your email address to establish your identity:");
             userInput = Console.ReadLine();
-            // add input validation with regex
+            Regex regex = new Regex(@"^\w+@\w+\.\w{3}$");
+            while (!regex.IsMatch(userInput)) {
+                Console.WriteLine("\nPlease enter a valid email address!");
+                userInput = Console.ReadLine();
+            }
             customer = customerService.GetCustomerByEmailAddress(userInput);
             shoppingMenu = new ShoppingMenu(customer, orderRepo);
         }
